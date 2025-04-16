@@ -84,6 +84,8 @@ The model achieved the following metrics on the test set:
 - **Pixel Accuracy**: 0.86996
 - **Mean Dice**: 0.3392
 
+  As the visualization it is crealy visible the predicted images are somewhat similar to the ground truth images, thus the model is trained in a good manner.
+
   
 ### Visualization
 
