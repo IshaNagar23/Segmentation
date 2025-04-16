@@ -17,3 +17,12 @@ We use two parts of the Cityscapes dataset:
 2. Download the ZIP files and extract them into the project directory like this:
 your_project/ ├── leftImg8bit/ │ └── train/ val/ test/ ├── gtFine/ │ └── train/ val/ test/
 
+### To convert the Cityscapes ground truth annotations into segmentation masks suitable for training a semantic segmentation model. These masks must be:
+
+1. In the correct shape and format
+2. Mapped to valid class indices
+3. Consistent across training, validation, and test splits
+4. Class Mapping Strategy
+The original Cityscapes dataset has 34 classes, but not all are useful or relevant for training. You mapped only the 19 valid classes using a dictionary and unwanted classes were ignored by setting them to 255
+
+
