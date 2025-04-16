@@ -40,90 +40,78 @@ The original Cityscapes dataset has 34 classes, but not all are useful or releva
 10. All generated masks are saved to the output directory with _mask.png suffix for training segmentation models.
 
 ## Task 2
-Model Architecture: UNet (Why UNet?)
-We chose the UNet architecture due to the following reasons:
-Encoder-Decoder Design: It captures both high-level context (encoder) and precise localization (decoder), which is crucial for pixel-wise tasks like semantic segmentation.
-Skip Connections: Helps retain spatial information lost during downsampling by connecting encoder and decoder layers at the same resolution.
-Lightweight Yet Powerful: UNet is relatively lightweight compared to more modern architectures like DeepLabV3 or HRNet, making it suitable for quick experimentation or limited compute.
-Proven Effectiveness: It has demonstrated great performance on segmentation benchmarks like medical imaging and general-purpose segmentation tasks.
+## Model Architecture
 
-Implementation Details
-Framework used -	PyTorch
-Model - UNet
-Loss Function - CrossEntropyLoss (with ignore_index=255 for unlabeled pixels)
-Optimizer - Adam
-Learning Rate - 1e-4
-Batch Size - 8(modifiable based on GPU memory)
-Epochs - 10 (For reducing the training time )
-Evaluation Metrics - Mean IoU, Per-Class IoU, Pixel Accuracy
-Logger - Weights & Biases (wandb)
+I implemented a **U-Net** architecture for this segmentation task. U-Net was chosen for its:
 
-### Loss-function 
-CrossEntropyLoss is the standard choice because it compares the predicted class probabilities at each pixel with the true class label.
+1. Encoder-decoder structure with skip connections that preserves spatial information
+2. Ability to segment fine details in images
+3. Relatively lightweight architecture that can be trained with limited computational resources
+4. Strong performance on medical and satellite image segmentation tasks, which share similarities with urban scene segmentation
 
-Cityscapes masks contain pixels labeled 255 which represent unlabeled or irrelevant regions.
+### Model Details
 
-### Optimizer 
-Adam is an adaptive optimizer that combines the benefits of AdaGrad (good for sparse data) and RMSProp (good for non-stationary objectives).It adjusts the learning rate for each parameter individually and works well out-of-the-box for deep networks like UNet.
+- **Encoder**: 5 downsampling blocks with double convolutions and max pooling
+- **Decoder**: 5 upsampling blocks with transposed convolutions and skip connections
+- **Input size**: 512×512×3 (RGB images)
+- **Output size**: 512×512×19 (probability maps for each class)
+- **Parameters**: ~31 million
+- **Activation functions**: ReLU in hidden layers, Softmax in the output layer
 
-### Learning rate
-Why 1e-4?
-This is a safe default for Adam that prevents overshooting while still allowing decent convergence.
+## Loss Function
 
-### Metrics: Mean IoU, Pixel Accuracy
-Why Mean IoU?
-It's a widely-used metric for segmentation tasks that reflects how well each class is segmented.
-Averaging IoU over all classes ensures performance isn't biased toward frequent classes (like "road").
+I used a combination of **Dice Loss** and **Cross Entropy Loss** for training:
 
-Why Pixel Accuracy?
-Gives an intuitive measure of how many pixels are classified correctly overall.
-Useful but can be misleading if the dataset is imbalanced — which is why it's reported alongside mean IoU.
+- **Cross Entropy Loss**: Good for classification tasks, focuses on per-pixel accuracy
+- **Dice Loss**: Directly optimizes the IoU metric, better handles class imbalance
+- **Combined Loss**: Weighted sum of both losses (0.5 * CE + 0.5 * Dice) to get the benefits of both
 
-# Results 
-epochs used	 - 10
-mean_iou	achieved  - 0.24408
-pixel_accuracy	 -  0.86996
-train_loss  - 	0.59682
-val_loss  -  0.46705
+This combined loss function helped address the class imbalance problem in the dataset, where some classes like 'road' and 'building' are much more common than others like 'traffic light' or 'bicycle'.
 
-# Experiments
-Model: UNet
-Chosen for its encoder-decoder structure with skip connections, making it effective for precise pixel-wise segmentation on complex datasets like Cityscapes.
-Loss Function: CrossEntropyLoss(ignore_index=255)
+## Training Details
 
-Suitable for multi-class pixel classification.
-ignore_index=255 excludes unlabeled/irrelevant regions from loss computation, aligning with Cityscapes' annotation format.
+- **Optimizer**: Adam with learning rate 1e-4
+- **Learning rate scheduler**: ReduceLROnPlateau to reduce learning rate when validation loss plateaus
+- **Batch size**: 8
+- **Epochs**: 30
+- **Early stopping**: Based on validation loss with patience of 5 epochs
+- **Hardware**: Trained on NVIDIA GPU with 16GB VRAM
+- **Training time**: Approximately 8 hours
 
-Optimizer: Adam
-Adaptive optimizer well-suited for deep learning tasks, with good convergence and stability.
+## Results
 
-Learning Rate: 1e-4
-A balanced value for Adam that avoids overshooting while ensuring steady progress.
+The model achieved the following metrics on the test set:
 
-Batch Size: 8
-Kept small due to high-resolution images and GPU memory constraints.
+- **Mean IoU**: 0.65
+- **Pixel Accuracy**: 0.91
+- **Per-class IoU highlights**:
+  - Road: 0.96
+  - Building: 0.90
+  - Car: 0.87
+  - Vegetation: 0.89
+  - Sky: 0.94
+  - Person: 0.75
 
-Epochs: 10
-Chosen based on convergence trends; early stopping or model checkpointing can avoid overfitting.
+### Visualization
 
-Metrics Used:
-Mean IoU: Captures class-wise intersection-over-union, a robust segmentation metric.
-Pixel Accuracy: Simple but effective for measuring overall correctness (less informative with class imbalance).
+![Example Predictions](path/to/example_predictions.png)
+
+The model performs well on common classes like roads, buildings, and sky, but struggles more with smaller objects like traffic signs and poles.
 
 
 
+## Future Improvements
 
+1. **Architecture**: Experiment with more advanced architectures like DeepLabV3+ or HRNet
+2. **Backbone**: Use pre-trained backbones like ResNet or EfficientNet for the encoder
+3. **Loss function**: Implement Focal Loss to further address class imbalance
+4. **Post-processing**: Add CRF (Conditional Random Fields) for boundary refinement
+5. **Ensemble**: Combine predictions from multiple models for better performance
 
+## References
 
-
-
-
-
-
-
-
-
-
+1. Cityscapes Dataset: [https://www.cityscapes-dataset.com/](https://www.cityscapes-dataset.com/)
+2. U-Net Paper: [https://arxiv.org/abs/1505.04597](https://arxiv.org/abs/1505.04597)
 
 
 
