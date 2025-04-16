@@ -73,10 +73,8 @@ This combined loss function helped address the class imbalance problem in the da
 - **Optimizer**: Adam with learning rate 1e-4
 - **Learning rate scheduler**: ReduceLROnPlateau to reduce learning rate when validation loss plateaus
 - **Batch size**: 8
-- **Epochs**: 30
-- **Early stopping**: Based on validation loss with patience of 5 epochs
-- **Hardware**: Trained on NVIDIA GPU with 16GB VRAM
-- **Training time**: Approximately 8 hours
+- **Epochs**: 10
+- **Training time**: Approximately 4 hours
 
 ## Results
 
