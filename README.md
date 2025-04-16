@@ -82,23 +82,20 @@ This combined loss function helped address the class imbalance problem in the da
 
 The model achieved the following metrics on the test set:
 
-- **Mean IoU**: 0.65
-- **Pixel Accuracy**: 0.91
-- **Per-class IoU highlights**:
-  - Road: 0.96
-  - Building: 0.90
-  - Car: 0.87
-  - Vegetation: 0.89
-  - Sky: 0.94
-  - Person: 0.75
+- **Mean IoU**: 0.24408
+- **Pixel Accuracy**: 0.86996
+- **Mean Dice**: 0.3392
 
+  
 ### Visualization
 
 ![Example Predictions](path/to/example_predictions.png)
 
-The model performs well on common classes like roads, buildings, and sky, but struggles more with smaller objects like traffic signs and poles.
-
-
+The training is also visualized on wandb and can be accessed with following links.
+View run unet-experiment at: https://wandb.ai/ishanagar205-indian-institute-of-science/cityscapes-segmentation/runs/kmkwhpyf
+View project at: https://wandb.ai/ishanagar205-indian-institute-of-science/cityscapes-segmentation
+Synced 5 W&B file(s), 18 media file(s), 0 artifact file(s) and 0 other file(s)
+Find logs at: ./wandb/run-20250416_091242-kmkwhpyf/logs
 
 ## Future Improvements
 
